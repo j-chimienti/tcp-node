@@ -5,19 +5,29 @@ const path = require('path')
 const fs = require('fs')
 require('dotenv').load()
 
-
 app.use(logger('dev'))
+
+app.use(express.static(__dirname + '/public'));
 // app.use(express.errorHandler());
 
 
-app.get('/hello', (req, res) => {
+app.get('/test/:name', (req, res) => {
 
-    res.send('hi')
+    res.send(`
+        <html>
+            <body>
+            <video src="/${req.params.name}.mp4" controls ></video>
+            </body>
+        </html>
+    `)
+})
+
+app.get('/', (req, res) => {
+
+    req.sendFile(path.join(__dirname, 'public', 'index'))
 })
 
 app.post('/upload/:filename', (req, res) => {
-
-
 
     if (!(req.query.token === process.env.UPLOAD_TOKEN)) {
 
@@ -40,14 +50,30 @@ app.post('/upload/:filename', (req, res) => {
 
         req.on('end', () => {
 
+            io.emit('NEW_VIDEO', "SI")
             res.status(200).send('done')
         })
     }
 
 });
 
-app.listen(3333, () => {
-    console.log('3333')
-})
+
+const http = require("http");
+var server = http.createServer(app).listen(3333)
+
+const io = require('socket.io')(server)
+
+io.on('connection', function(client) {
+    console.log('Client connected...');
+
+    client.on('join', function(data) {
+        console.log(data);
+    });
+
+});
+
+
+app.io = io
+
 
 module.exports = app

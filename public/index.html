@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>video</title>
+</head>
+<body>
+
+<video src="/sample.mp4" controls >
+
+</video>
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+<script>
+    var socket = io.connect('http://localhost:3333');
+    socket.on('connect', function(data) {
+        socket.emit('join', 'Hello World from client');
+    });
+
+    socket.on('NEW_VIDEO', (data) => {
+        alert(data)
+    })
+</script>
+</body>
+</html>
